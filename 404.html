@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <title>404 — Spécimen introuvable · Alexandre Morin</title>
+  <link rel="icon" type="image/png" href="uploads/cursor-flower.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,600&family=Newsreader:ital,opsz,wght@1,6..72,300;1,6..72,500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'DM Sans', system-ui, sans-serif; background: #101208; color: #ece5d2; }
+    a { color: #8fb3c9; } a:hover { color: #ffb3a0; }
+    @keyframes wilt { 0%{transform:rotate(0deg);} 100%{transform:rotate(9deg) translateY(6px);} }
+    @keyframes glitch404 { 0%,91%,100%{transform:translate(0,0);opacity:1;filter:none;} 92%{transform:translate(-4px,2px);filter:hue-rotate(-60deg);} 94%{transform:translate(4px,-2px);filter:hue-rotate(50deg);} 96%{transform:translate(-2px,-1px);filter:invert(.12);} }
+    @keyframes fallPetal { 0%{transform:translateY(0) rotate(0deg);opacity:.9;} 100%{transform:translateY(180px) rotate(120deg);opacity:0;} }
+  </style>
+</helmet>
+
+<div style="min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden;padding:40px 24px;">
+  <img src="uploads/htehgfdhvgf.png" alt="" style="position:absolute;top:-70px;left:-70px;width:280px;transform:rotate(150deg);opacity:.16;filter:grayscale(.7);pointer-events:none;"/>
+  <img src="uploads/fwewe.png" alt="" style="position:absolute;bottom:-80px;right:-60px;width:300px;transform:rotate(-20deg);opacity:.14;filter:grayscale(.7);pointer-events:none;"/>
+
+  <p style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.3em;color:#b8442b;text-transform:uppercase;margin-bottom:18px;">Erreur de catalogage</p>
+
+  <div style="position:relative;display:flex;align-items:center;gap:clamp(8px,3vw,28px);">
+    <span style="font-family:'Anton',sans-serif;font-size:clamp(110px,22vw,230px);line-height:1;animation:glitch404 5s steps(40) infinite;">4</span>
+    <div style="position:relative;width:clamp(80px,16vw,170px);display:flex;justify-content:center;">
+      <img src="uploads/gergegw.png" alt="" style="width:100%;filter:grayscale(.85) brightness(.75);transform-origin:bottom center;animation:wilt 3.6s ease-in-out infinite alternate;display:block;"/>
+      <span style="position:absolute;top:16%;left:8%;font-size:13px;color:#8a7a5e;animation:fallPetal 4.2s ease-in 1.2s infinite;">✿</span>
+      <span style="position:absolute;top:28%;right:6%;font-size:11px;color:#8a7a5e;animation:fallPetal 5s ease-in 2.6s infinite;">✿</span>
+    </div>
+    <span style="font-family:'Anton',sans-serif;font-size:clamp(110px,22vw,230px);line-height:1;animation:glitch404 5s steps(40) 1.7s infinite;">4</span>
+  </div>
+
+  <div style="margin-top:34px;text-align:center;max-width:52ch;">
+    <h1 style="font-family:'Newsreader',serif;font-style:italic;font-weight:300;font-size:clamp(22px,3.4vw,30px);color:#ece5d2;margin-bottom:12px;">Ce spécimen s'est fané —<br>ou n'a jamais été récolté.</h1>
+    <p style="font-size:14px;font-weight:300;line-height:1.75;color:#b9baa6;">La planche que tu cherches ne figure pas dans l'herbier. Elle a peut-être été déplacée, compostée, ou mangée par un yordle.</p>
+  </div>
+
+  <a href="index.html" style="margin-top:36px;display:inline-flex;align-items:center;gap:10px;padding:13px 30px;background:#ece5d2;color:#181b11;text-decoration:none;font-family:'Space Mono',monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;transition:background .2s,color .2s;" style-hover="background:#b8442b;color:#ece5d2;">↩ Retour au jardin</a>
+
+  <p style="position:absolute;bottom:22px;font-family:'Space Mono',monospace;font-size:8px;letter-spacing:.22em;color:#7a8168;">MACHINA FLORA · PLANCHE 404 · NON RÉPERTORIÉE</p>
+</div>
+</x-dc>
+</body>
+</html>

@@ -70,8 +70,8 @@
 <!-- Indicateur de scroll : tige qui pousse -->
 <div id="am-stem" style="position:fixed;left:14px;top:50%;transform:translateY(-50%);height:min(58vh,520px);width:20px;z-index:9998;pointer-events:none;">
   <div style="position:absolute;left:9px;top:0;bottom:0;width:1px;background:rgba(236,229,210,.12);"></div>
-  <div id="am-stem-fill" style="position:absolute;left:8.5px;bottom:0;width:2px;height:0%;background:linear-gradient(to top,#3d451f,#8a9a68);"></div>
-  <img id="am-stem-tip" src="uploads/gergegw.png" alt="" style="position:absolute;left:50%;bottom:0%;width:20px;transform:translate(-50%,40%);filter:drop-shadow(0 1px 4px rgba(0,0,0,.5));"/>
+  <div id="am-stem-fill" style="position:absolute;left:8.5px;bottom:0;width:2px;height:100%;background:linear-gradient(to top,#3d451f,#8a9a68);transform:scaleY(0);transform-origin:bottom;will-change:transform;"></div>
+  <img id="am-stem-tip" src="uploads/gergegw.png" alt="" style="position:absolute;left:50%;bottom:0;width:20px;transform:translate(-50%,40%);will-change:transform;filter:drop-shadow(0 1px 4px rgba(0,0,0,.5));"/>
 </div>
 
 <!-- Curseur fleur (vraie fleur pressée) -->
@@ -532,7 +532,7 @@
           <div style="position:absolute;top:-10px;right:24%;width:56px;height:20px;background:rgba(236,229,210,.55);transform:rotate(5deg);"></div>
         </div>
         <div style="grid-column:span 3;position:relative;background:#e8e3d3;padding:12px 12px 10px;box-shadow:0 18px 44px rgba(0,0,0,.5);transform:rotate(1deg);margin-top:28px;">
-          <video src="uploads/totw2.webm" controls autoplay loop muted playsinline style="width:100%;display:block;"></video>
+          <video src="uploads/totw2.webm" controls loop muted playsinline preload="metadata" style="width:100%;display:block;"></video>
           <p style="margin-top:8px;font-family:'Space Mono',monospace;font-size:8px;letter-spacing:.14em;color:#5a5544;">[02.1-N] · MOTION · TEAM OF THE WEEK</p>
         </div>
       </div>
@@ -897,8 +897,8 @@ class Component extends DCLogic {
   scrollTop() { return window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0; }
   maxScroll()  { return Math.max(document.documentElement.scrollHeight, document.body.scrollHeight) - window.innerHeight; }
   onScroll(fn) {
+    // capture:true sur document suffit : il intercepte le scroll de page ET des conteneurs internes
     document.addEventListener('scroll', fn, { passive:true, capture:true });
-    window.addEventListener('scroll', fn, { passive:true });
   }
 
   componentDidMount() {
@@ -1007,6 +1007,7 @@ class Component extends DCLogic {
       const pm = document.getElementById('proj-modal');
       if (pm && pm.style.display === 'block') {
         pm.style.opacity = '0';
+        pm.querySelectorAll('video').forEach(v => v.pause());
         setTimeout(() => { pm.style.display = 'none'; document.body.style.overflow = ''; }, 300);
         return;
       }
@@ -1025,12 +1026,20 @@ class Component extends DCLogic {
     const tip  = document.getElementById('am-stem-tip');
     if (!fill || !tip) return;
     const doc = document.scrollingElement || document.documentElement;
+    // géométrie en cache : plus aucune lecture de layout au scroll
+    let stemH = 0, maxS2 = 1;
+    const refreshStem = () => {
+      const box = fill.parentElement;
+      stemH = box ? box.clientHeight : 0;
+      maxS2 = Math.max(1, doc.scrollHeight - innerHeight);
+    };
+    refreshStem();
+    addEventListener('resize', refreshStem, { passive: true });
+    addEventListener('load', refreshStem);
     const upd = () => {
-      const p = Math.min(1, Math.max(0, doc.scrollTop / (doc.scrollHeight - innerHeight)));
-      const pct = (p * 100).toFixed(2) + '%';
-      fill.style.height = pct;
-      tip.style.bottom = pct;
-      tip.style.transform = `translate(-50%,40%) rotate(${(p * 160).toFixed(1)}deg)`;
+      const p = Math.min(1, Math.max(0, doc.scrollTop / maxS2));
+      fill.style.transform = `scaleY(${p.toFixed(4)})`;
+      tip.style.transform = `translate(-50%,40%) translateY(${(-p * stemH).toFixed(1)}px) rotate(${(p * 160).toFixed(1)}deg)`;
     };
     this.onScroll(upd);
     upd();
@@ -1167,6 +1176,18 @@ class Component extends DCLogic {
       return d;
     });
     const lastOp = layers.map(() => -1);
+
+    // Géométrie en cache : aucune lecture de layout pendant le scroll
+    const ids = ['hero','about','projects','contact'];
+    let maxS = 1;
+    const secTops = {};
+    const refreshBgGeo = () => {
+      maxS = Math.max(1, this.maxScroll());
+      ids.forEach(id => { const s = document.getElementById(id); if (s) secTops[id] = s.offsetTop; });
+    };
+    refreshBgGeo();
+    addEventListener('resize', refreshBgGeo, { passive: true });
+    addEventListener('load', refreshBgGeo);
     const interp = (p) => {
       const n = stops.length - 1;
       const i = Math.min(Math.floor(p * n), n - 1);
@@ -1175,9 +1196,8 @@ class Component extends DCLogic {
       return [lerp(a[0],b[0],t), lerp(a[1],b[1],t), lerp(a[2],b[2],t)];
     };
     const update = () => {
-      const max = this.maxScroll();
       const st  = this.scrollTop();
-      const p   = max > 0 ? Math.min(1, Math.max(0, st / max)) : 0;
+      const p   = Math.min(1, Math.max(0, st / maxS));
       // Courbe : reste sombre jusqu'à ~60% puis accélère vers le crème
       const eased = Math.pow(p, 1.6);
       const n = stops.length - 1;
@@ -1188,10 +1208,9 @@ class Component extends DCLogic {
         if (lastOp[k] !== o) { lastOp[k] = o; layers[k].style.opacity = o; }
       }
 
-      const ids = ['hero','about','projects','contact'];
       const sy  = st + 160;
       let cur   = 'hero';
-      ids.forEach(id => { const s = document.getElementById(id); if (s && s.offsetTop <= sy) cur = id; });
+      ids.forEach(id => { if (secTops[id] !== undefined && secTops[id] <= sy) cur = id; });
       document.querySelectorAll('[data-rail]').forEach(a => {
         const active = a.dataset.rail === cur;
         const dot = a.querySelector('[data-rd]');
@@ -1406,6 +1425,7 @@ class Component extends DCLogic {
         const pm = document.getElementById('proj-modal');
         if (!pm) return;
         pm.style.opacity = '0';
+        pm.querySelectorAll('video').forEach(v => v.pause());
         setTimeout(() => { pm.style.display = 'none'; document.body.style.overflow = ''; }, 300);
       });
     }
